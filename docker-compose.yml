@@ -13,6 +13,8 @@ version: '3'
 
 services:
   wikibase:
+    env_file: .env
+
     image: wikibase/wikibase:1.30-bundle
     links:
       - mysql
@@ -20,38 +22,35 @@ services:
     # CONFIG - Change the 8181 here to expose Wikibase & MediaWiki on a different port
      - "8181:80"
     volumes:
-      - mediawiki-images-data:/var/www/html/images
+     - /var/www/html/images:/var/www/html/images
     depends_on:
-    - mysql
-    - elasticsearch
+     - mysql
+     - elasticsearch
     networks:
       default:
         aliases:
          - wikibase.svc
-         # CONFIG - Add your real wikibase hostname here, for example wikibase-registry.wmflabs.org
     environment:
       - DB_SERVER=mysql.svc:3306
+   #   - DB_USER=${DB_USER}
+   #   - DB_PASS=${DB_PASS}
+   #   - DB_NAME=${DB_NAME}
+   #   - MW_ADMIN_NAME=${MW_ADMIN_NAME}
+   #   - MW_ADMIN_PASS=${MW_ADMIN_PASS}
+   #   - MW_WG_SECRET_KEY=${MW_WG_SECRET_KEY}
       - MW_ELASTIC_HOST=elasticsearch.svc
       - MW_ELASTIC_PORT=9200
-      # CONFIG - Change the default values below
-      - MW_ADMIN_NAME=admin
-      - MW_ADMIN_PASS=adminpass
       - MW_WG_SECRET_KEY=secretkey
-      # CONFIG - Change the default values below (should match mysql values in this file)
-      - DB_USER=wikiuser
-      - DB_PASS=sqlpass
-      - DB_NAME=my_wiki
   mysql:
     image: mariadb:10.3
     restart: always
     volumes:
-      - mediawiki-mysql-data:/var/lib/mysql
+      - /var/lib/mysql_wikibase:/var/lib/mysql
     environment:
-      MYSQL_RANDOM_ROOT_PASSWORD: 'yes'
-      # CONFIG - Change the default values below (should match values passed to wikibase)
-      MYSQL_DATABASE: 'my_wiki'
-      MYSQL_USER: 'wikiuser'
-      MYSQL_PASSWORD: 'sqlpass'
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     networks:
       default:
         aliases:
@@ -71,7 +70,7 @@ services:
       - WIKIBASE_HOST=wikibase.svc
       - WDQS_HOST=wdqs-proxy.svc
   wdqs:
-    image: wikibase/wdqs:0.3.0
+    image: wikibase/wdqs:0.3.1
     volumes:
       - query-service-data:/wdqs/data
     command: /runBlazegraph.sh
@@ -112,6 +111,7 @@ services:
      - WDQS_HOST=wdqs.svc
      - WDQS_PORT=9999
   elasticsearch:
+    env_file: .env
     image: elasticsearch@sha256:f1dbf2019dc9a4ca5dd458635bfb31f9a601e4905e1d6ca1d65a3958d428f497
     networks:
       default:
@@ -119,7 +119,6 @@ services:
          - elasticsearch.svc
     environment:
       discovery.type: single-node
-  # CONFING, in order to not load quickstatements then remove this entire section
   quickstatements:
     image: wikibase/quickstatements:latest
     ports:
@@ -131,18 +130,15 @@ services:
         aliases:
          - quickstatements.svc
     environment:
-      # CONFIG, you have to config this if you want quickstatements
-      - OAUTH_CONSUMER_KEY=559fcf1da153c5ec4b2fbefa7c3c395b
-      - OAUTH_CONSUMER_SECRET=57cad33da0015dce1e94a597908e19848714a6af
-      - QS_PUBLIC_SCHEME_HOST_AND_PORT=http://localhost:9191
-      - WB_PUBLIC_SCHEME_HOST_AND_PORT=http://localhost:8181
-      - WIKIBASE_SCHEME_AND_HOST=http://wikibase.svc
+      - OAUTH_CONSUMER_KEY=${OAUTH_CONSUMER_KEY}
+      - OAUTH_CONSUMER_SECRET=${OAUTH_CONSUMER_SECRET}
+      - QS_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource-query.wmflabs.org
+      - WB_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource.wmflabs.org
+      - WIKIBASE_SCHEME_AND_HOST=wikibase.svc
       - WB_PROPERTY_NAMESPACE=122
       - "WB_PROPERTY_PREFIX=Property:"
       - WB_ITEM_NAMESPACE=120
       - "WB_ITEM_PREFIX=Item:"
 
 volumes:
-  mediawiki-mysql-data:
-  mediawiki-images-data:
   query-service-data:

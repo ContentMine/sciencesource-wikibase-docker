@@ -14,3 +14,30 @@ require_once "${DOLLAR}IP/extensions/CirrusSearch/CirrusSearch.php";
 ${DOLLAR}wgCirrusSearchServers = [ '${MW_ELASTIC_HOST}' ];
 ${DOLLAR}wgSearchType = 'CirrusSearch';
 ${DOLLAR}wgCirrusSearchExtraIndexSettings['index.mapping.total_fields.limit'] = 5000;
+
+${DOLLAR}wgLogo = '/scisrclogo.svg';
+
+# Define constants for additional namespaces.
+define("NS_ARTICLE", 3100); // This MUST be even.
+define("NS_ARTICLE_TALK", 3101); // This MUST be the following odd integer.
+
+# Add namespaces.
+${DOLLAR}wgExtraNamespaces[NS_ARTICLE] = "Article";
+${DOLLAR}wgExtraNamespaces[NS_ARTICLE_TALK] = "Article_talk"; // Note underscores in the namespace name.
+
+${DOLLAR}wgScriptPath = "/w";        // this should already have been configured this way
+${DOLLAR}wgArticlePath = "/wiki/${DOLLAR}1";
+
+## Shared memory settings               
+${DOLLAR}wgMainCacheType = CACHE_ANYTHING;
+${DOLLAR}wgSessionsInObjectCache = true;
+
+# Initially prevent unknown users from creating accounts or editing
+${DOLLAR}wgGroupPermissions['*']['edit'] = false;
+${DOLLAR}wgGroupPermissions['*']['createaccount'] = false;
+
+require_once "${DOLLAR}IP/extensions/NamespaceHTML/NamespaceHTML.php";
+
+${DOLLAR}wgRawHtmlNamespaces = array( NS_ARTICLE ); # allow raw HTML but only in the Article namespace
+
+session_save_path("tmp");

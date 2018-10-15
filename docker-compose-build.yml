@@ -39,7 +39,7 @@ services:
       - MW_ELASTIC_HOST=elasticsearch.svc
       - MW_ELASTIC_PORT=9200
   mysql:
-    image: mariadb:latest
+    image: mariadb:10.3
     volumes:
       - /var/lib/mysql_wikibase:/var/lib/mysql
     environment:

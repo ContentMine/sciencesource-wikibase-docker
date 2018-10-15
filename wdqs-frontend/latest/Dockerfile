@@ -1,8 +1,7 @@
 FROM ubuntu:xenial as fetcher
 
 RUN apt-get update && \
-    apt-get install --yes --no-install-recommends unzip=6.* && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+    apt-get install --yes --no-install-recommends unzip=6.*
 
 ADD https://github.com/wikimedia/wikidata-query-gui/archive/master.zip ./master.zip
 
@@ -22,6 +21,7 @@ RUN set -x ; \
     && mv package.json package.json.orig \
     && jq 'delpaths([["devDependencies","karma-qunit"],["devDependencies","qunitjs"],["devDependencies","sinon"]])' \
         > package.json < package.json.orig \
+    && npm i npm@latest -g \
     && npm install \
     && rm -rf /usr/share/nginx/html \
     && mv /tmp/wikidata-query-gui-master /usr/share/nginx/html \

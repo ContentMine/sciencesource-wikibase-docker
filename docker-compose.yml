@@ -30,6 +30,7 @@ services:
       default:
         aliases:
          - wikibase.svc
+         - sciencesource.wmflabs.org
     environment:
       - DB_SERVER=mysql.svc:3306
    #   - DB_USER=${DB_USER}
@@ -67,19 +68,19 @@ services:
         aliases:
          - wdqs-frontend.svc
     environment:
-      - WIKIBASE_HOST=wikibase.svc
+      - WIKIBASE_HOST=sciencesource.wmflabs.org
       - WDQS_HOST=wdqs-proxy.svc
   wdqs:
     image: wikibase/wdqs:0.3.1
     volumes:
-      - query-service-data:/wdqs/data
+      - /var/lib/queryservice-data_wikibase:/wdqs/data
     command: /runBlazegraph.sh
     networks:
       default:
         aliases:
          - wdqs.svc
     environment:
-      - WIKIBASE_HOST=wikibase.svc
+      - WIKIBASE_HOST=sciencesource.wmflabs.org
       - WDQS_HOST=wdqs.svc
       - WDQS_PORT=9999
     expose:
@@ -107,7 +108,7 @@ services:
         aliases:
          - wdqs-updater.svc
     environment:
-     - WIKIBASE_HOST=wikibase.svc
+     - WIKIBASE_HOST=sciencesource.wmflabs.org
      - WDQS_HOST=wdqs.svc
      - WDQS_PORT=9999
   elasticsearch:
@@ -139,6 +140,3 @@ services:
       - "WB_PROPERTY_PREFIX=Property:"
       - WB_ITEM_NAMESPACE=120
       - "WB_ITEM_PREFIX=Item:"
-
-volumes:
-  query-service-data:

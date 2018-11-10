@@ -133,7 +133,7 @@ services:
     environment:
       - OAUTH_CONSUMER_KEY=${OAUTH_CONSUMER_KEY}
       - OAUTH_CONSUMER_SECRET=${OAUTH_CONSUMER_SECRET}
-      - QS_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource-query.wmflabs.org
+      - QS_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource-qs.wmflabs.org
       - WB_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource.wmflabs.org
       - WIKIBASE_SCHEME_AND_HOST=wikibase.svc
       - WB_PROPERTY_NAMESPACE=122

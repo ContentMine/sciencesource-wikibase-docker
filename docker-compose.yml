@@ -120,23 +120,32 @@ services:
          - elasticsearch.svc
     environment:
       discovery.type: single-node
-  quickstatements:
-    image: wikibase/quickstatements:latest
+  review:
+    build:
+      context: ./ScienceSourceReview
+      dockerfile: Dockerfile
     ports:
-     - "9191:80"
+    - "4242:4242"
     depends_on:
     - wikibase
-    networks:
-      default:
-        aliases:
-         - quickstatements.svc
-    environment:
-      - OAUTH_CONSUMER_KEY=${OAUTH_CONSUMER_KEY}
-      - OAUTH_CONSUMER_SECRET=${OAUTH_CONSUMER_SECRET}
-      - QS_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource-qs.wmflabs.org
-      - WB_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource.wmflabs.org
-      - WIKIBASE_SCHEME_AND_HOST=wikibase.svc
-      - WB_PROPERTY_NAMESPACE=122
-      - "WB_PROPERTY_PREFIX=Property:"
-      - WB_ITEM_NAMESPACE=120
-      - "WB_ITEM_PREFIX=Item:"
+    - wdqs
+#  quickstatements:
+#    image: wikibase/quickstatements:latest
+#    ports:
+#     - "9191:80"
+#    depends_on:
+#    - wikibase
+#    networks:
+#      default:
+#        aliases:
+#         - quickstatements.svc
+#    environment:
+#      - OAUTH_CONSUMER_KEY=${OAUTH_CONSUMER_KEY}
+#      - OAUTH_CONSUMER_SECRET=${OAUTH_CONSUMER_SECRET}
+#      - QS_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource-qs.wmflabs.org
+#      - WB_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource.wmflabs.org
+#      - WIKIBASE_SCHEME_AND_HOST=wikibase.svc
+#      - WB_PROPERTY_NAMESPACE=122
+#      - "WB_PROPERTY_PREFIX=Property:"
+#      - WB_ITEM_NAMESPACE=120
+#      - "WB_ITEM_PREFIX=Item:"

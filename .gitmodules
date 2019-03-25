@@ -1,0 +1,3 @@
+[submodule "ScienceSourceReview"]
+	path = ScienceSourceReview
+	url = https://github.com/ContentMine/ScienceSourceReview.git

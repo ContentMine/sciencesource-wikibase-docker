@@ -23,6 +23,7 @@ services:
      - "8181:80"
     volumes:
      - /var/www/html/images:/var/www/html/images
+     - /var/www/html/LocalSettings.php:/var/www/html/LocalSettings.php
     depends_on:
      - mysql
      - elasticsearch
@@ -46,7 +47,7 @@ services:
     image: mariadb:10.3
     restart: always
     volumes:
-      - /var/lib/mysql_wikibase:/var/lib/mysql
+      - /srv/mysql_wikibase:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -73,7 +74,7 @@ services:
   wdqs:
     image: wikibase/wdqs:0.3.1
     volumes:
-      - /var/lib/queryservice-data_wikibase:/wdqs/data
+      - /srv/queryservice-data_wikibase:/wdqs/data
     command: /runBlazegraph.sh
     networks:
       default:

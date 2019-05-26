@@ -33,8 +33,8 @@ ${DOLLAR}wgMainCacheType = CACHE_ANYTHING;
 ${DOLLAR}wgSessionsInObjectCache = true;
 
 # Initially prevent unknown users from creating accounts or editing
-${DOLLAR}wgGroupPermissions['*']['edit'] = false;
-${DOLLAR}wgGroupPermissions['*']['createaccount'] = false;
+#${DOLLAR}wgGroupPermissions['*']['edit'] = true;
+#${DOLLAR}wgGroupPermissions['*']['createaccount'] = true;
 
 require_once "${DOLLAR}IP/extensions/NamespaceHTML/NamespaceHTML.php";
 

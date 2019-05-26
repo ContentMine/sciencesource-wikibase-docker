@@ -1,0 +1,143 @@
+# Wikibase with Query Service
+#
+# This docker-compose example can be used to build and run the images.
+#
+# Access Wikibase via "http://localhost:8181"
+#   (or "http://$(docker-machine ip):8181" if using docker-machine)
+#
+# Access Query Service via "http://localhost:8282"
+#   (or "http://$(docker-machine ip):8282" if using docker-machine)
+version: '3'
+
+services:
+  wikibase:
+    image: wikibase/wikibase:1.30-bundle
+    build:
+      context: ./wikibase/1.30/bundle
+      dockerfile: Dockerfile
+    links:
+      - mysql
+    ports:
+     - "8181:80"
+    volumes:
+      - /var/www/html/images:/var/www/html/images
+    depends_on:
+    - mysql
+    - elasticsearch
+    networks:
+      default:
+        aliases:
+         - wikibase.svc
+    environment:
+      - DB_SERVER=mysql.svc:3306
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - MW_ADMIN_NAME=${MW_ADMIN_NAME}
+      - MW_ADMIN_PASS=${MW_ADMIN_PASS}
+      - MW_WG_SECRET_KEY=${MW_WG_SECRET_KEY}
+      - MW_ELASTIC_HOST=elasticsearch.svc
+      - MW_ELASTIC_PORT=9200
+  mysql:
+    image: mariadb:10.3
+    volumes:
+      - /srv/volumes/mysql_wikibase:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      default:
+        aliases:
+         - mysql.svc
+  elasticsearch:
+    image: elasticsearch@sha256:f1dbf2019dc9a4ca5dd458635bfb31f9a601e4905e1d6ca1d65a3958d428f497
+    networks:
+      default:
+        aliases:
+         - elasticsearch.svc
+    environment:
+      discovery.type: single-node
+  wdqs-frontend:
+    image: wikibase/wdqs-frontend:latest
+    build:
+      context: ./wdqs-frontend/latest
+      dockerfile: Dockerfile
+    ports:
+     - "8282:80"
+    depends_on:
+    - wdqs-proxy
+    networks:
+      default:
+        aliases:
+         - wdqs-frontend.svc
+    environment:
+      - WIKIBASE_HOST=wikibase.svc
+      - WDQS_HOST=wdqs-proxy.svc
+  wdqs:
+    image: wikibase/wdqs:0.3.1
+    restart: always
+    build:
+      context: ./wdqs/0.3.1
+      dockerfile: Dockerfile
+    volumes:
+      - /srv/volumes/queryservice-data_wikibase:/wdqs/data
+    command: /runBlazegraph.sh
+    networks:
+      default:
+        aliases:
+         - wdqs.svc
+    environment:
+      - WIKIBASE_HOST=wikibase.svc
+      - WDQS_HOST=wdqs.svc
+      - WDQS_PORT=9999
+    expose:
+      - 9999
+  wdqs-proxy:
+    image: wikibase/wdqs-proxy
+    build:
+      context: ./wdqs-proxy/latest
+      dockerfile: Dockerfile
+    environment:
+      - PROXY_PASS_HOST=wdqs.svc:9999
+    ports:
+     - "8989:80"
+    depends_on:
+    - wdqs
+    networks:
+      default:
+        aliases:
+         - wdqs-proxy.svc
+  review:
+    build:
+      context: ./ScienceSourceReview
+      dockerfile: Dockerfile
+    ports:
+    - "4242:4242"
+    depends_on:
+    - wikibase
+    - wdqs
+#  quickstatements:
+#    image: wikibase/quickstatements:latest
+#    build:
+#      context: ./quickstatements/latest
+#      dockerfile: Dockerfile
+#    ports:
+#     - "9191:80"
+#    depends_on:
+#    - wikibase
+#    networks:
+#      default:
+#        aliases:
+#         - quickstatements.svc
+#    environment:
+#      - OAUTH_CONSUMER_KEY=${OAUTH_CONSUMER_KEY}
+#      - OAUTH_CONSUMER_SECRET=${OAUTH_CONSUMER_SECRET}
+#      - QS_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource-qs.wmflabs.org
+#      - WB_PUBLIC_SCHEME_HOST_AND_PORT=https://sciencesource.wmflabs.org
+#      - WIKIBASE_SCHEME_AND_HOST=wikibase.svc
+#      - WB_PROPERTY_NAMESPACE=122
+#      - "WB_PROPERTY_PREFIX=Property:"
+#      - WB_ITEM_NAMESPACE=120
+#      - "WB_ITEM_PREFIX=Item:"

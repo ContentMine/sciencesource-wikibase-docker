@@ -47,7 +47,7 @@ services:
     image: mariadb:10.3
     restart: always
     volumes:
-      - /srv/mysql_wikibase:/var/lib/mysql
+      - /srv/docker_volumes/mysql_wikibase:/var/lib/mysql
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE}
       MYSQL_USER: ${MYSQL_USER}
@@ -74,7 +74,7 @@ services:
   wdqs:
     image: wikibase/wdqs:0.3.1
     volumes:
-      - /srv/queryservice-data_wikibase:/wdqs/data
+      - /srv/docker_volumes/queryservice-data_wikibase:/wdqs/data
     command: /runBlazegraph.sh
     networks:
       default:

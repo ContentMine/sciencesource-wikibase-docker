@@ -13,7 +13,7 @@ FROM openjdk:8-jdk-alpine
 # Blazegraph scripts require bash
 # Install gettext for envsubst command, (it needs libintl package)
 RUN set -x ; \
-    apk --no-cache add bash~=4.4.19-r1 gettext~=0.19.8.1-r2 libintl~=0.19.8.1-r2
+    apk --no-cache add bash~=4.4.19-r1 gettext~=0.19.8.1-r4 libintl~=0.19.8.1-r4
 
 COPY --from=fetcher /service-0.3.1-SNAPSHOT /wdqs
 
@@ -23,7 +23,7 @@ ENV MEMORY=""\
     HOST="0.0.0.0"\
     WDQS_ENTITY_NAMESPACES="120,122"\
     WIKIBASE_SCHEME="http"\
-    WIKIBASE_MAX_DAYS_BACK="90"
+    WIKIBASE_MAX_DAYS_BACK="365"
 
 WORKDIR /wdqs
 
